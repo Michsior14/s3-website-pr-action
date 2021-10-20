@@ -1,4 +1,4 @@
-import * as github from "@actions/github";
+import * as github from '@actions/github';
 import githubClient from '../githubClient';
 
 export default async (
@@ -8,9 +8,9 @@ export default async (
     },
     environmentPrefix: string
 ) => {
-    const environment = `${environmentPrefix || 'PR-'}${github.context.payload.pull_request!.number}`;
+    const environment = `${environmentPrefix || 'pr-'}${github.context.payload.pull_request!.number}`;
 
-    const deployments = await githubClient.graphql(`
+    const deployments = await githubClient.graphql<{repository?: {deployments?: {nodes: {id: string}[]}}}>(`
       query GetDeployments($owner: String!, $repo: String!, $environments: [String!]) {
         repository(owner: $owner, name: $repo) {
           deployments(first: 100, environments: $environments) {
@@ -26,7 +26,7 @@ export default async (
     console.log(JSON.stringify(deployments))
 
     if (nodes.length <= 0) {
-        console.log(`No exiting deployments found for pull request`);
+        console.log('No exiting deployments found for pull request');
         return;
     }
 

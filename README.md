@@ -8,7 +8,7 @@
 
 See [s3-website-pr-action-example](https://github.com/danburtenshaw/s3-website-pr-action-example) for an example application using [create-react-app](https://github.com/facebook/create-react-app).
 
-## PR opened or updated:
+## PR opened or updated
 
 ```yaml
 name: PR
@@ -37,31 +37,40 @@ build:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
-Execute the `s3-website-pr-action` action on pull request `opened`, `synchronize` and `reopened` events. This will create a new S3 static site and upload the contents of `folder-to-copy`. 
+
+Execute the `s3-website-pr-action` action on pull request `opened`, `synchronize` and `reopened` events. This will create a new S3 static site and upload the contents of `folder-to-copy`.
 The site url will be posted as a comment on the pull request.  
 
 Note: By default, workflows using the `pull_request` activity type will include the above events. [Docs](https://help.github.com/en/actions/reference/events-that-trigger-workflows#pull-request-event-pull_request)
 
 ### Required Environment Variables
+
 Environment Variable | Description
 ------------ | -------------
 AWS_ACCESS_KEY_ID | AWS Access Key ID of an IAM user
 AWS_SECRET_ACCESS_KEY | AWS Secret Access Key of an IAM user
 GITHUB_TOKEN | GitHub automatically provides the secret value
 
+### Optional Environment Variables
+
+Environment Variable | Description
+------------ | -------------
+AWS_REGION | AWS region for s3 bucket
+
 ### Required Parameters
+
 Parameter | Description
 ------------ | -------------
 bucket-prefix | Prefix to the S3 bucket name
 folder-to-copy | The directory to your built web app. This folder will be copied to S3
 
 ### Optional Parameters
+
 Parameter | Description
 ------------ | -------------
 environment-prefix | Prefix to the GitHub Deployment. Defaults to 'PR-'
 
-
-## PR closed:
+## PR closed
 
 ```yaml
 name: PR - Closed
@@ -83,9 +92,11 @@ build:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
+
 Execute the `s3-website-pr-action` action on pull request `closed` events. This will remove the S3 bucket that was created in the previous stage.
 
 ### Required Environment Variables
+
 Environment Variable | Description
 ------------ | -------------
 AWS_ACCESS_KEY_ID | AWS Access Key ID of an IAM user
@@ -93,11 +104,13 @@ AWS_SECRET_ACCESS_KEY | AWS Secret Access Key of an IAM user
 GITHUB_TOKEN | GitHub automatically provides the secret value
 
 ### Required Parameters
+
 Parameter | Description
 ------------ | -------------
 bucket-prefix | Prefix to the S3 bucket name. This should be the same value as the other stage
 
 ### Optional Parameters
+
 Parameter | Description
 ------------ | -------------
 environment-prefix | Prefix to the GitHub Deployment. Defaults to 'PR-'

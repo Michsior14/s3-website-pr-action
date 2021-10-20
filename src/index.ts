@@ -5,9 +5,9 @@ import prUpdatedAction from './actions/prUpdatedAction';
 
 const main = async () => {
   try {
-    const bucketPrefix = core.getInput('bucket-prefix');
+    const bucketPrefix = core.getInput('bucket-prefix').toLowerCase();
     const folderToCopy = core.getInput('folder-to-copy');
-    const environmentPrefix = core.getInput('environment-prefix');
+    const environmentPrefix = core.getInput('environment-prefix').toLowerCase();
 
     const prNumber = github.context.payload.pull_request!.number;
     const bucketName = `${bucketPrefix}-pr${prNumber}`;
@@ -29,7 +29,7 @@ const main = async () => {
           break;
 
         default:
-          console.log('PR not created, modified or deleted. Skiping...');
+          console.log('PR not created, modified or deleted. Skipping...');
           break;
       }
     } else {
