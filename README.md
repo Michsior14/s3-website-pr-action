@@ -139,7 +139,7 @@ Replace `<YOUR_BUCKET_PREFIX>` with the same `bucket-prefix` value that you defi
                 "s3:ListBucket"
             ],
             "Resource": [
-                "arn:aws:s3:::<YOUR_BUCKET_PREFIX>-*",
+                "arn:aws:s3:::<YOUR_BUCKET_PREFIX>-*"
             ]
         }
     ]

@@ -1,4 +1,8 @@
 import * as github from '@actions/github';
+import {
+  CreateBucketCommand,
+  PutBucketWebsiteCommand,
+} from '@aws-sdk/client-s3';
 import { RestEndpointMethodTypes } from '@octokit/plugin-rest-endpoint-methods';
 import githubClient from '../githubClient';
 import S3 from '../s3Client';
@@ -13,7 +17,11 @@ export const requiredEnvVars = [
   'GITHUB_TOKEN',
 ];
 
-export default async (bucketName: string, uploadDirectory: string, environmentPrefix: string) => {
+export default async (
+  bucketName: string,
+  uploadDirectory: string,
+  environmentPrefix: string
+) => {
   const region = process.env.AWS_REGION || 'us-east-1';
   const websiteUrl = `http://${bucketName}.s3-website.${region}.amazonaws.com`;
   const { repo } = github.context;
@@ -27,30 +35,39 @@ export default async (bucketName: string, uploadDirectory: string, environmentPr
 
   if (!bucketExists) {
     console.log('S3 bucket does not exist. Creating...');
-    await S3.createBucket({ Bucket: bucketName, CreateBucketConfiguration: {LocationConstraint: region} }).promise();
+    await S3.send(
+      new CreateBucketCommand({
+        Bucket: bucketName,
+        CreateBucketConfiguration: { LocationConstraint: region },
+      })
+    );
 
     console.log('Configuring bucket website...');
-    await S3.putBucketWebsite({
-      Bucket: bucketName,
-      WebsiteConfiguration: {
-        IndexDocument: { Suffix: 'index.html' },
-        ErrorDocument: { Key: 'index.html' },
-      },
-    }).promise();
+    await S3.send(
+      new PutBucketWebsiteCommand({
+        Bucket: bucketName,
+        WebsiteConfiguration: {
+          IndexDocument: { Suffix: 'index.html' },
+          ErrorDocument: { Key: 'index.html' },
+        },
+      })
+    );
   } else {
     console.log('S3 Bucket already exists. Skipping creation...');
   }
 
   await deactivateDeployments(repo, environmentPrefix);
 
-  const deployment = await githubClient.rest.repos.createDeployment({
+  const deployment = (await githubClient.rest.repos.createDeployment({
     ...repo,
     ref: `refs/heads/${branchName}`,
-    environment: `${environmentPrefix || 'pr-'}${github.context.payload.pull_request!.number}`,
+    environment: `${environmentPrefix || 'pr-'}${
+      github.context.payload.pull_request!.number
+    }`,
     auto_merge: false,
     transient_environment: true,
     required_contexts: [],
-  }) as RestEndpointMethodTypes['repos']['createDeployment']['response'];
+  })) as RestEndpointMethodTypes['repos']['createDeployment']['response'];
 
   if ('id' in deployment.data) {
     await githubClient.rest.repos.createDeploymentStatus({

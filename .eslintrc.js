@@ -18,9 +18,6 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: ['@typescript-eslint'],
-  rules: {
-    quotes: [2, 'single', { avoidEscape: true }],
-  },
   overrides: [
     {
       files: ['*.ts', '*.tsx'],
